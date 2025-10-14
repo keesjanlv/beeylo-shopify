@@ -7,7 +7,7 @@ export const config = {
   shopify: {
     apiKey: process.env.SHOPIFY_API_KEY || '',
     apiSecret: process.env.SHOPIFY_API_SECRET || '',
-    scopes: process.env.SHOPIFY_SCOPES || 'read_orders,read_customers,read_products,read_fulfillments',
+    scopes: process.env.SHOPIFY_SCOPES || 'read_customers,read_discounts,read_fulfillments,write_fulfillments,read_inventory,read_orders,read_products',
     host: process.env.SHOPIFY_HOST || 'http://localhost:3001',
     webhookSecret: process.env.SHOPIFY_WEBHOOK_SECRET || '',
   },
