@@ -1,0 +1,21 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.production
+*.log
+.DS_Store
+coverage/
+.vscode/
+.idea/
+
+# Temporary files
+check-webhooks.ts
+*.tmp
+*.temp
+
+# OS files
+Thumbs.db
+.AppleDouble
+.LSOverride
