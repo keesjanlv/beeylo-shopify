@@ -80,9 +80,25 @@ app.use('/auth', authRoutes);
 app.use('/webhooks', webhookRoutes);
 app.use('/api', apiRoutes);
 
-// Root endpoint - Serve the dashboard UI
+// Root endpoint - Serve the dashboard UI (only visible inside Shopify admin)
 app.get('/', (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+  try {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+  } catch (error) {
+    // Fallback if HTML file doesn't exist
+    res.json({
+      status: 'running',
+      service: 'Beeylo Shopify Integration',
+      message: 'This app is running correctly. To use it, install it in your Shopify admin.',
+      endpoints: {
+        health: '/health',
+        install: '/auth/shopify?shop=YOUR_STORE.myshopify.com&company_id=YOUR_COMPANY_ID',
+        api: '/api',
+        webhooks: '/webhooks',
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // Error handling middleware
