@@ -83,11 +83,12 @@ export class SyncService {
 
       // Try to link to existing Beeylo user by email
       const beeyloUser = await this.findBeeyloUserByEmail(customerData.email);
+      const customerDataWithUser: any = { ...customerData };
       if (beeyloUser) {
-        customerData.beeylo_user_id = beeyloUser.id;
+        customerDataWithUser.beeylo_user_id = beeyloUser.id;
       }
 
-      return await db.upsertCustomer(customerData);
+      return await db.upsertCustomer(customerDataWithUser);
     } catch (error) {
       console.error('Failed to sync customer:', error);
       throw error;

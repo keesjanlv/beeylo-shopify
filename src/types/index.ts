@@ -157,6 +157,7 @@ export interface CourierTrackingResponse {
   events: CourierEvent[];
   estimated_delivery?: string;
   actual_delivery?: string;
+  current_location?: string;
 }
 
 export interface CourierEvent {

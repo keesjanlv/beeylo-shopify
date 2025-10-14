@@ -15,6 +15,9 @@ export const supabase = createClient(
 
 // Database helper functions
 export const db = {
+  // Export supabase client for direct access
+  supabase,
+
   // Shopify Stores
   async getStore(storeId: string) {
     const { data, error } = await supabase

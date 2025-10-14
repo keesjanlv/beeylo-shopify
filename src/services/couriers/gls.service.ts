@@ -70,14 +70,6 @@ export class GLSService {
         estimated_delivery: glsStatus.DeliveryInfo.EstimatedDeliveryDate,
         actual_delivery: glsStatus.DeliveryInfo.ActualDeliveryDate,
         events: events,
-        proof_of_delivery: glsStatus.PODInfo?.SignatureAvailable
-          ? {
-              signature_url: glsStatus.PODInfo.SignatureUrl,
-              photo_url: glsStatus.PODInfo.PhotoUrl,
-              receiver_name: glsStatus.PODInfo.ReceiverName,
-              timestamp: glsStatus.PODInfo.DeliveryDate,
-            }
-          : undefined,
       };
     } catch (error) {
       console.error('[GLS] Tracking error:', error);
@@ -87,21 +79,12 @@ export class GLSService {
 
   private mapStatusCode(glsCode: string): string {
     const statusMap: Record<string, string> = {
-      'PREADVICE': 'pending',
-      'COLLECTED': 'in_transit',
-      'IN_TRANSIT': 'in_transit',
-      'AT_DEPOT': 'in_transit',
-      'AT_HUB': 'in_transit',
-      'OUT_FOR_DELIVERY': 'out_for_delivery',
-      'DELIVERED': 'delivered',
-      'DELIVERY_FAILED': 'failure',
-      'AWAITING_COLLECTION': 'available_for_pickup',
-      'COLLECTED_BY_RECIPIENT': 'delivered',
-      'RETURNED': 'return_to_sender',
-      'CANCELLED': 'cancelled',
-      'EXCEPTION': 'failure',
-      'DAMAGED': 'failure',
-      'LOST': 'failure',
+      '0': 'pending',
+      '1': 'in_transit',
+      '2': 'out_for_delivery',
+      '3': 'delivered',
+      '4': 'failure',
+      '5': 'return_to_sender',
     };
 
     return statusMap[glsCode] || 'unknown';

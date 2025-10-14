@@ -52,11 +52,6 @@ export class DPDService {
         events: events,
         estimated_delivery: data.predictedDeliveryDate,
         actual_delivery: data.deliveryDate,
-        proof_of_delivery: data.proofOfDelivery ? {
-          signature_url: data.proofOfDelivery.signatureUrl,
-          receiver_name: data.proofOfDelivery.recipientName,
-          timestamp: data.deliveryDate,
-        } : undefined,
       };
     } catch (error) {
       console.error('[DPD] Tracking error:', error);

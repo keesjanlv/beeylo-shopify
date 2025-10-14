@@ -153,14 +153,6 @@ export const shopifyHelpers = {
       path: `webhooks/${webhookId}`,
     });
   },
-
-  // Verify webhook authenticity
-  verifyWebhook(body: string, hmacHeader: string): boolean {
-    return shopify.webhooks.validate({
-      rawBody: body,
-      rawHeader: hmacHeader,
-    });
-  },
 };
 
 // Webhook topics to register

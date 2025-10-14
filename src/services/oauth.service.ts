@@ -52,9 +52,9 @@ export class OAuthService {
       throw new Error(`Failed to exchange code for access token: ${response.statusText}`);
     }
 
-    const tokenData = await response.json();
-    const accessToken = tokenData.access_token;
-    const scope = tokenData.scope;
+    const tokenData: any = await response.json();
+    const accessToken = tokenData.access_token as string;
+    const scope = tokenData.scope as string;
 
     if (!accessToken) {
       throw new Error('Failed to obtain access token');

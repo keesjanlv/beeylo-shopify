@@ -4,7 +4,7 @@ import { CourierTrackingResponse, CourierEvent } from '../../types';
 
 export class FedExService {
   private client: AxiosInstance;
-  private accessToken: string | null = null;
+  private accessToken: string = '';
 
   constructor() {
     if (!config.couriers.fedex.clientId || !config.couriers.fedex.clientSecret) {
@@ -44,7 +44,7 @@ export class FedExService {
         }
       );
 
-      this.accessToken = response.data.access_token;
+      this.accessToken = response.data.access_token || '';
       return this.accessToken;
     } catch (error) {
       console.error('[FedEx] OAuth error:', error);
@@ -100,15 +100,10 @@ export class FedExService {
         tracking_number: trackingNumber,
         status: this.mapStatusCode(trackResult.latestStatusDetail?.code || 'unknown'),
         status_description: trackResult.latestStatusDetail?.description || '',
-        current_location: trackResult.latestStatusDetail?.scanLocation?.city || events[events.length - 1]?.location,
+        current_location: trackResult.latestStatusDetail?.scanLocation?.city || events[events.length - 1]?.location || '',
         events: events,
         estimated_delivery: trackResult.estimatedDeliveryTimeWindow?.window?.begins,
         actual_delivery: trackResult.actualDeliveryTimestamp,
-        proof_of_delivery: trackResult.deliveryDetails?.receivedByName ? {
-          receiver_name: trackResult.deliveryDetails.receivedByName,
-          signature_url: trackResult.deliveryDetails.signatureImageUrl,
-          timestamp: trackResult.actualDeliveryTimestamp,
-        } : undefined,
       };
     } catch (error) {
       console.error('[FedEx] Tracking error:', error);
@@ -137,7 +132,7 @@ export class FedExService {
       const status = error.response.status;
       switch (status) {
         case 401:
-          this.accessToken = null; // Clear token to force re-auth
+          this.accessToken = ''; // Clear token to force re-auth
           return new Error('FedEx authentication failed - check credentials');
         case 404:
           return new Error('Tracking number not found');

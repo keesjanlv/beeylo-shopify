@@ -52,11 +52,6 @@ export class PostNLService {
         events: events,
         estimated_delivery: data.expectedDeliveryDate,
         actual_delivery: data.actualDeliveryDate,
-        proof_of_delivery: data.signature ? {
-          signature_url: data.signature.imageUrl,
-          receiver_name: data.signature.receiverName,
-          timestamp: data.actualDeliveryDate,
-        } : undefined,
       };
     } catch (error) {
       console.error('[PostNL] Tracking error:', error);

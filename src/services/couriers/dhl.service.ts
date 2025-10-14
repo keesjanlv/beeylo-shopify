@@ -60,11 +60,6 @@ export class DHLService {
         events: events,
         estimated_delivery: shipment.estimatedTimeOfDelivery,
         actual_delivery: shipment.details?.proofOfDelivery?.timestamp,
-        proof_of_delivery: shipment.details?.proofOfDelivery ? {
-          signature_url: shipment.details.proofOfDelivery.signatureUrl,
-          receiver_name: shipment.details.proofOfDelivery.signed?.name,
-          timestamp: shipment.details.proofOfDelivery.timestamp,
-        } : undefined,
       };
     } catch (error) {
       console.error('[DHL] Tracking error:', error);

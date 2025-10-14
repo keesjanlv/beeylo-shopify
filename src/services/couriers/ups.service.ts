@@ -4,7 +4,7 @@ import { CourierTrackingResponse, CourierEvent } from '../../types';
 
 export class UPSService {
   private client: AxiosInstance;
-  private accessToken: string | null = null;
+  private accessToken: string = '';
 
   constructor() {
     if (!config.couriers.ups.clientId || !config.couriers.ups.clientSecret) {
@@ -45,7 +45,7 @@ export class UPSService {
         }
       );
 
-      this.accessToken = response.data.access_token;
+      this.accessToken = response.data.access_token || '';
       return this.accessToken;
     } catch (error) {
       console.error('[UPS] OAuth error:', error);
@@ -89,14 +89,10 @@ export class UPSService {
         tracking_number: trackingNumber,
         status: this.mapStatusCode(pkg?.currentStatus?.type || 'unknown'),
         status_description: pkg?.currentStatus?.description || '',
-        current_location: pkg?.currentStatus?.location?.address?.city || events[events.length - 1]?.location,
+        current_location: pkg?.currentStatus?.location?.address?.city || events[events.length - 1]?.location || '',
         events: events,
         estimated_delivery: pkg?.deliveryDate?.[0]?.date,
         actual_delivery: pkg?.deliveryInformation?.receivedBy ? pkg.deliveryDate?.[0]?.date : undefined,
-        proof_of_delivery: pkg?.deliveryInformation?.receivedBy ? {
-          receiver_name: pkg.deliveryInformation.receivedBy,
-          timestamp: pkg.deliveryDate?.[0]?.date,
-        } : undefined,
       };
     } catch (error) {
       console.error('[UPS] Tracking error:', error);
@@ -122,7 +118,7 @@ export class UPSService {
       const status = error.response.status;
       switch (status) {
         case 401:
-          this.accessToken = null; // Clear token to force re-auth
+          this.accessToken = ''; // Clear token to force re-auth
           return new Error('UPS authentication failed - check credentials');
         case 404:
           return new Error('Tracking number not found');
