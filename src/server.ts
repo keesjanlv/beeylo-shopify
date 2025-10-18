@@ -83,8 +83,19 @@ app.use('/auth', authRoutes);
 app.use('/webhooks', webhookRoutes);
 app.use('/api', apiRoutes);
 
-// Root endpoint - Serve the dashboard UI (only visible inside Shopify admin)
+// Settings page - Serve after installation
+app.get('/settings', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'views', 'settings.html'));
+});
+
+// Root endpoint - Serve settings page by default after connection
 app.get('/', (req: Request, res: Response) => {
+  // If connected parameter exists, show settings
+  if (req.query.connected || req.query.store_id) {
+    return res.sendFile(path.join(__dirname, 'views', 'settings.html'));
+  }
+
+  // Otherwise show dashboard
   try {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
   } catch (error) {
@@ -98,6 +109,7 @@ app.get('/', (req: Request, res: Response) => {
         install: '/auth/shopify?shop=YOUR_STORE.myshopify.com&company_id=YOUR_COMPANY_ID',
         api: '/api',
         webhooks: '/webhooks',
+        settings: '/settings',
       },
       timestamp: new Date().toISOString(),
     });

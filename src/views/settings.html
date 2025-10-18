@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beeylo Settings - Shopify Integration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3B82F6;
+            --primary-hover: #2563EB;
+            --primary-light: #DBEAFE;
+            --accent: #10B981;
+            --accent-light: #D1FAE5;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            padding: 24px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        .success-banner {
+            background: var(--success-light);
+            border: 1px solid var(--success);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--success);
+        }
+
+        .success-banner i {
+            font-size: 1.5rem;
+        }
+
+        .section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .section-subtitle {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 20px 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-subtitle i {
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+        }
+
+        .warning-box {
+            background: var(--warning-light);
+            border-left: 4px solid var(--warning);
+            padding: 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+        }
+
+        .info-box p, .warning-box p {
+            margin: 0;
+            color: var(--gray-800);
+            font-size: 0.9rem;
+        }
+
+        .steps {
+            list-style: none;
+            counter-reset: step-counter;
+            padding-left: 0;
+        }
+
+        .steps li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .steps li strong {
+            color: var(--gray-900);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .feature-card {
+            background: var(--gray-50);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .feature-card i {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .feature-card h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .feature-card p {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        .code-block {
+            background: var(--gray-900);
+            color: #E5E7EB;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--gray-200);
+            margin-bottom: 24px;
+            gap: 8px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 10px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .checklist li i {
+            color: var(--accent);
+            margin-top: 3px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-cog"></i>
+                Beeylo Shopify Integration Settings
+            </h1>
+            <p>Configure app delivery notifications and manage your Shopify integration</p>
+        </div>
+
+        <!-- Success Banner -->
+        <div class="success-banner" id="success-banner" style="display: none;">
+            <i class="fas fa-check-circle"></i>
+            <div>
+                <strong>Connection Successful!</strong>
+                <p>Your Shopify store is now connected to Beeylo. The integration is active and ready to use.</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">
+                <i class="fas fa-home"></i> Overview
+            </button>
+            <button class="tab" onclick="switchTab('setup')">
+                <i class="fas fa-wrench"></i> App Delivery Setup
+            </button>
+            <button class="tab" onclick="switchTab('flow')">
+                <i class="fas fa-project-diagram"></i> Shopify Flow (Plus)
+            </button>
+            <button class="tab" onclick="switchTab('dashboard')">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    What is App Delivery?
+                </div>
+                <p style="margin-bottom: 16px;">
+                    The Beeylo App Delivery feature allows your customers to receive order updates directly in the Beeylo mobile app instead of via email. This provides a better customer experience with real-time push notifications and centralized order tracking.
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h4>In-App Notifications</h4>
+                        <p>Orders appear in the Beeylo app with real-time updates</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-bell"></i>
+                        <h4>Push Notifications</h4>
+                        <p>Instant alerts for order confirmations and shipping updates</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-envelope-open-text"></i>
+                        <h4>Email Suppression</h4>
+                        <p>Optionally disable emails when customers opt for app delivery</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-user-check"></i>
+                        <h4>Customer Choice</h4>
+                        <p>Simple checkbox at cart page for customer opt-in</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-check-circle"></i>
+                    What's Already Configured
+                </div>
+                <ul class="checklist">
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span><strong>Script Tag Registered:</strong> The cart integration script is automatically injected on all storefront pages</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span><strong>Webhooks Active:</strong> Order events are automatically synced to Beeylo</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span><strong>Notification System:</strong> Push notifications are configured and ready</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span><strong>Database Ready:</strong> Order tracking tables are set up in Supabase</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Setup Tab -->
+        <div id="setup" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    How It Works
+                </div>
+
+                <ol class="steps">
+                    <li>
+                        <strong>Customer Visits Cart</strong>
+                        <span>The Beeylo script automatically injects a checkbox: "Receive order updates in Beeylo app instead of email"</span>
+                    </li>
+                    <li>
+                        <strong>Customer Opts In</strong>
+                        <span>If checked, the preference is saved as a cart attribute: <code>Receive_in_Beeylo_App = Yes</code></span>
+                    </li>
+                    <li>
+                        <strong>Customer Completes Checkout</strong>
+                        <span>The cart attribute is passed to the order as a note attribute</span>
+                    </li>
+                    <li>
+                        <strong>Order Created</strong>
+                        <span>Shopify fires the orders/create webhook to Beeylo</span>
+                    </li>
+                    <li>
+                        <strong>Notification Routing</strong>
+                        <span>Beeylo detects the preference and sends notification to the app (or email if not opted in)</span>
+                    </li>
+                </ol>
+
+                <div class="warning-box">
+                    <p><strong><i class="fas fa-exclamation-triangle"></i> Important:</strong> The script is automatically enabled. No manual theme edits required! However, you may want to test the checkout flow to ensure the checkbox appears correctly on your theme.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-vial"></i>
+                    Testing the Integration
+                </div>
+
+                <div class="section-subtitle">
+                    <i class="fas fa-play-circle"></i>
+                    Test Scenario 1: App Delivery
+                </div>
+                <ol class="steps">
+                    <li>
+                        <strong>Add product to cart</strong>
+                        <span>Visit your store and add any product to cart</span>
+                    </li>
+                    <li>
+                        <strong>Go to cart page</strong>
+                        <span>You should see a checkbox: "Receive order updates in Beeylo app instead of email"</span>
+                    </li>
+                    <li>
+                        <strong>Check the box</strong>
+                        <span>Enable app delivery by checking the checkbox</span>
+                    </li>
+                    <li>
+                        <strong>Complete checkout</strong>
+                        <span>Use a test customer email that's linked to a Beeylo user</span>
+                    </li>
+                    <li>
+                        <strong>Verify notification</strong>
+                        <span>Check the Beeylo app for the order notification (NO email should be sent)</span>
+                    </li>
+                </ol>
+
+                <div class="section-subtitle">
+                    <i class="fas fa-play-circle"></i>
+                    Test Scenario 2: Email Delivery (Default)
+                </div>
+                <ol class="steps">
+                    <li>
+                        <strong>Create order without checkbox</strong>
+                        <span>Complete checkout WITHOUT checking the app delivery box</span>
+                    </li>
+                    <li>
+                        <strong>Verify email sent</strong>
+                        <span>Customer should receive normal Shopify order confirmation email</span>
+                    </li>
+                </ol>
+
+                <div class="btn-group">
+                    <a href="javascript:openShopifyAdmin()" class="btn">
+                        <i class="fas fa-external-link-alt"></i> Open Shopify Admin
+                    </a>
+                    <a href="javascript:openStorefront()" class="btn btn-secondary">
+                        <i class="fas fa-store"></i> View Store Cart
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shopify Flow Tab -->
+        <div id="flow" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-project-diagram"></i>
+                    Shopify Flow Integration (Plus Only)
+                </div>
+
+                <div class="info-box">
+                    <p><strong><i class="fas fa-info-circle"></i> Note:</strong> Shopify Flow is only available for Shopify Plus merchants. If you don't have Plus, skip to the "Non-Plus Alternatives" section below.</p>
+                </div>
+
+                <p style="margin-bottom: 20px;">
+                    Use Shopify Flow to automatically suppress email notifications when customers opt for app delivery. This ensures they don't receive duplicate notifications.
+                </p>
+
+                <div class="section-subtitle">
+                    <i class="fas fa-arrow-right"></i>
+                    Setup Workflow: Suppress Order Confirmation Email
+                </div>
+
+                <ol class="steps">
+                    <li>
+                        <strong>Open Shopify Flow</strong>
+                        <span>Go to: Shopify Admin → Apps → Flow → Create workflow</span>
+                    </li>
+                    <li>
+                        <strong>Set Trigger</strong>
+                        <span>Trigger: <code>Order created</code></span>
+                    </li>
+                    <li>
+                        <strong>Add Condition</strong>
+                        <span>IF Order → Note attributes → Contains "Receive_in_Beeylo_App" AND Contains "Yes"</span>
+                    </li>
+                    <li>
+                        <strong>Add Action</strong>
+                        <span>Action: Add tag to order<br>Tag: <code>beeylo-app-delivery</code></span>
+                    </li>
+                    <li>
+                        <strong>Add Note (Optional)</strong>
+                        <span>Action: Add note to order<br>Note: "Customer opted for Beeylo app delivery - email notifications suppressed"</span>
+                    </li>
+                    <li>
+                        <strong>Save Workflow</strong>
+                        <span>Name: "Beeylo App Delivery - Suppress Email"<br>Status: Active</span>
+                    </li>
+                </ol>
+
+                <div class="section-subtitle">
+                    <i class="fas fa-code"></i>
+                    Flow Diagram
+                </div>
+                <div class="code-block">Order Created (Trigger)
+    ↓
+Check if note_attributes contains "Receive_in_Beeylo_App" = "Yes"
+    ↓
+[TRUE] → Add tag: "beeylo-app-delivery"
+    ↓
+Add note: "Customer opted for app delivery"</div>
+
+                <div class="section-subtitle">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Non-Plus Alternatives
+                </div>
+
+                <p style="margin-bottom: 12px; color: var(--gray-700);">If you don't have Shopify Plus, here are alternative options:</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-cog"></i>
+                        <h4>Option 1: Disable All Emails</h4>
+                        <p>Settings → Notifications → Uncheck "Automatically send order confirmation"</p>
+                        <p style="margin-top: 8px; color: var(--warning);"><strong>Warning:</strong> This disables emails for ALL customers</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-plug"></i>
+                        <h4>Option 2: Third-Party Apps</h4>
+                        <p>Use apps like Klaviyo, Omnisend, or Brevo with conditional logic to handle email suppression</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-envelope"></i>
+                        <h4>Option 3: Accept Duplicate Notifications</h4>
+                        <p>Let Beeylo send app notifications while Shopify still sends emails (customers get both)</p>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <a href="SHOPIFY_FLOW_GUIDE.md" target="_blank" class="btn">
+                        <i class="fas fa-book"></i> View Full Flow Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Integration Dashboard
+                </div>
+
+                <div class="info-box">
+                    <p><strong><i class="fas fa-info-circle"></i> Tip:</strong> Monitor your integration stats, recent orders, and webhook events from the main dashboard.</p>
+                </div>
+
+                <div class="btn-group">
+                    <a href="/" class="btn">
+                        <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                    </a>
+                    <a href="IMPLEMENTATION_GUIDE.md" target="_blank" class="btn btn-secondary">
+                        <i class="fas fa-book-open"></i> View Implementation Guide
+                    </a>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-question-circle"></i>
+                    Troubleshooting
+                </div>
+
+                <div class="section-subtitle">
+                    <i class="fas fa-bug"></i>
+                    Common Issues
+                </div>
+
+                <ul class="checklist">
+                    <li>
+                        <i class="fas fa-times-circle" style="color: #DC2626;"></i>
+                        <div>
+                            <strong>Script not appearing on cart page</strong>
+                            <p style="margin-top: 4px; color: var(--gray-600); font-size: 0.85rem;">Check browser console for errors. Verify script URL is accessible at <code>/public/beeylo-cart-integration.js</code></p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-times-circle" style="color: #DC2626;"></i>
+                        <div>
+                            <strong>Cart attribute not being captured</strong>
+                            <p style="margin-top: 4px; color: var(--gray-600); font-size: 0.85rem;">Inspect cart form. Use <code>fetch('/cart.js')</code> in console to verify attributes are set</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-times-circle" style="color: #DC2626;"></i>
+                        <div>
+                            <strong>Notifications not being delivered</strong>
+                            <p style="margin-top: 4px; color: var(--gray-600); font-size: 0.85rem;">Check if customer has <code>beeylo_user_id</code> linked in the database. Verify FCM tokens are valid</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="btn-group">
+                    <a href="https://github.com/keesjanlv/beeylo-shopify/issues" target="_blank" class="btn btn-secondary">
+                        <i class="fas fa-life-ring"></i> Get Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for success parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('connected') === 'true') {
+            document.getElementById('success-banner').style.display = 'flex';
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.closest('.tab').classList.add('active');
+        }
+
+        // Helper functions
+        function openShopifyAdmin() {
+            const shop = urlParams.get('shop');
+            if (shop) {
+                window.open(`https://${shop}/admin`, '_blank');
+            } else {
+                alert('Please access this page through your Shopify admin.');
+            }
+        }
+
+        function openStorefront() {
+            const shop = urlParams.get('shop');
+            if (shop) {
+                window.open(`https://${shop.replace('.myshopify.com', '')}.myshopify.com/cart`, '_blank');
+            } else {
+                alert('Please access this page through your Shopify admin.');
+            }
+        }
+    </script>
+</body>
+</html>
