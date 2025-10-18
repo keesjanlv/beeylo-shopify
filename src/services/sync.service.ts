@@ -12,13 +12,20 @@ export class SyncService {
   /**
    * Sync a single order from Shopify to database
    */
-  async syncOrder(storeId: string, shopifyOrder: any) {
+  async syncOrder(storeId: string, shopifyOrder: any, receiveInApp?: boolean) {
     try {
       // First, sync the customer if exists
       let customerId = null;
       if (shopifyOrder.customer) {
         const customer = await this.syncCustomer(storeId, shopifyOrder.customer);
         customerId = customer.id;
+      }
+
+      // Check for receive_in_app from note_attributes if not explicitly provided
+      if (receiveInApp === undefined) {
+        receiveInApp = shopifyOrder.note_attributes?.find(
+          (attr: any) => attr.name === 'Receive_in_Beeylo_App'
+        )?.value === 'Yes';
       }
 
       // Prepare order data
@@ -36,6 +43,7 @@ export class SyncService {
         line_items: this.formatLineItems(shopifyOrder.line_items),
         shipping_address: shopifyOrder.shipping_address,
         billing_address: shopifyOrder.billing_address,
+        receive_in_app: receiveInApp || false,
         created_at: shopifyOrder.created_at,
         updated_at: shopifyOrder.updated_at,
         cancelled_at: shopifyOrder.cancelled_at,
@@ -81,14 +89,14 @@ export class SyncService {
         synced_at: new Date().toISOString(),
       };
 
-      // Try to link to existing Beeylo user by email
-      const beeyloUser = await this.findBeeyloUserByEmail(customerData.email);
-      const customerDataWithUser: any = { ...customerData };
-      if (beeyloUser) {
-        customerDataWithUser.beeylo_user_id = beeyloUser.id;
-      }
+      const customer = await db.upsertCustomer(customerData);
 
-      return await db.upsertCustomer(customerDataWithUser);
+      // Auto-link to Beeylo user by email
+      const { CustomerLinkingService } = await import('./customer-linking.service');
+      const linkingService = new CustomerLinkingService();
+      await linkingService.autoLinkByEmail(customer.id);
+
+      return customer;
     } catch (error) {
       console.error('Failed to sync customer:', error);
       throw error;

@@ -153,6 +153,40 @@ export const shopifyHelpers = {
       path: `webhooks/${webhookId}`,
     });
   },
+
+  // List script tags
+  async listScriptTags(shop: string, accessToken: string) {
+    const client = createRestClient(shop, accessToken);
+
+    const response = await client.get({
+      path: 'script_tags',
+    });
+
+    return response.body as any;
+  },
+
+  // Register a script tag
+  async registerScriptTag(shop: string, accessToken: string, scriptData: { event: string; src: string; display_scope: string }) {
+    const client = createRestClient(shop, accessToken);
+
+    const response = await client.post({
+      path: 'script_tags',
+      data: {
+        script_tag: scriptData,
+      },
+    });
+
+    return response.body as any;
+  },
+
+  // Delete a script tag
+  async deleteScriptTag(shop: string, accessToken: string, scriptTagId: string) {
+    const client = createRestClient(shop, accessToken);
+
+    await client.delete({
+      path: `script_tags/${scriptTagId}`,
+    });
+  },
 };
 
 // Webhook topics to register

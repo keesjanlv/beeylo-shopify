@@ -93,10 +93,45 @@ export class OAuthService {
     // Register webhooks
     await this.registerWebhooks(shop, accessToken, store.id);
 
+    // Register script tag for cart integration
+    await this.registerScriptTag(shop, accessToken);
+
     // Trigger initial sync
     await this.performInitialSync(store.id, shop, accessToken);
 
     return store;
+  }
+
+  /**
+   * Register script tag for Beeylo cart integration
+   */
+  private async registerScriptTag(shop: string, accessToken: string) {
+    try {
+      const scriptUrl = `${config.urls.app}/public/beeylo-cart-integration.js`;
+
+      // Check if script tag already exists
+      const existingScripts = await shopifyHelpers.listScriptTags(shop, accessToken);
+      const scriptExists = existingScripts.script_tags?.some(
+        (script: any) => script.src === scriptUrl
+      );
+
+      if (scriptExists) {
+        console.log(`Script tag already registered for ${shop}`);
+        return;
+      }
+
+      // Register new script tag
+      await shopifyHelpers.registerScriptTag(shop, accessToken, {
+        event: 'onload',
+        src: scriptUrl,
+        display_scope: 'online_store',
+      });
+
+      console.log(`✅ Script tag registered for ${shop}: ${scriptUrl}`);
+    } catch (error) {
+      console.error('Failed to register script tag:', error);
+      // Don't throw - script tag is nice-to-have, not critical
+    }
   }
 
   /**
@@ -186,6 +221,21 @@ export class OAuthService {
       }
     } catch (error) {
       console.error('Failed to delete webhooks:', error);
+    }
+
+    // Delete script tags
+    try {
+      const scripts = await shopifyHelpers.listScriptTags(store.shop_domain, store.access_token);
+
+      if (scripts.script_tags) {
+        for (const script of scripts.script_tags) {
+          if (script.src?.includes(config.urls.app)) {
+            await shopifyHelpers.deleteScriptTag(store.shop_domain, store.access_token, script.id);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete script tags:', error);
     }
 
     // Deactivate store

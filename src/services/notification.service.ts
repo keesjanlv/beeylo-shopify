@@ -1,12 +1,22 @@
 import { db } from '../lib/supabase';
+import { OrderSyncService } from './order-sync.service';
 
 export class NotificationService {
+  private orderSync: OrderSyncService;
+
+  constructor() {
+    this.orderSync = new OrderSyncService();
+  }
+
   /**
-   * Send order confirmation notification
+   * Send order confirmation notification (email-based)
    */
   async sendOrderConfirmation(order: any) {
     try {
-      // Find the customer and their Beeylo user ID
+      // 1. Sync to orders table FIRST
+      await this.orderSync.syncToFlutterOrders(order.id);
+
+      // 2. Find the customer and their Beeylo user ID
       const customer = await db.supabase
         .from('shopify_customers')
         .select('*, beeylo_user_id')
@@ -48,6 +58,56 @@ export class NotificationService {
       return notification;
     } catch (error) {
       console.error('Failed to send order confirmation:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Send in-app notification (for customers who opted for app delivery)
+   */
+  async sendInAppNotification(order: any) {
+    try {
+      // 1. Sync to orders table FIRST
+      await this.orderSync.syncToFlutterOrders(order.id);
+
+      // 2. Find the customer and their Beeylo user ID
+      const customer = await db.supabase
+        .from('shopify_customers')
+        .select('*, beeylo_user_id')
+        .eq('id', order.customer_id)
+        .single();
+
+      if (!customer.data?.beeylo_user_id) {
+        console.log(`No Beeylo user linked for customer ${order.customer_id}`);
+        return null;
+      }
+
+      // Create notification
+      const notification = await db.createNotification({
+        order_id: order.id,
+        customer_id: order.customer_id,
+        beeylo_user_id: customer.data.beeylo_user_id,
+        type: 'order_confirmation',
+        title: `Order Confirmed - ${order.order_number}`,
+        message: `Your order has been confirmed and is being prepared for shipment. Track it here in the Beeylo app!`,
+        data: {
+          order_number: order.order_number,
+          total_price: order.total_price,
+          currency: order.currency,
+          line_items: order.line_items,
+          estimated_delivery: this.estimateDelivery(),
+          delivery_method: 'app', // Flag to identify app delivery
+        },
+      });
+
+      // Send to Beeylo app
+      await this.sendToBeeyloApp(notification);
+
+      console.log(`✅ In-app notification sent for order ${order.order_number}`);
+
+      return notification;
+    } catch (error) {
+      console.error('Failed to send in-app notification:', error);
       return null;
     }
   }
@@ -205,8 +265,8 @@ export class NotificationService {
       // Mark notification as sent
       await db.markNotificationSent(notification.id);
 
-      // TODO: Send push notification via Firebase Cloud Messaging
-      // await this.sendPushNotification(notification);
+      // Send push notification via FCM
+      await this.sendPushNotification(notification);
 
       return ticket;
     } catch (error) {
@@ -216,12 +276,50 @@ export class NotificationService {
   }
 
   /**
-   * Send push notification (integrate with FCM)
+   * Send push notification via Supabase Edge Function
    */
   private async sendPushNotification(notification: any) {
-    // TODO: Implement Firebase Cloud Messaging integration
-    // This would send a push notification to the user's mobile device
-    console.log('Push notification:', notification.title);
+    try {
+      const supabaseUrl = process.env.SUPABASE_URL;
+      const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+      if (!supabaseUrl || !supabaseAnonKey) {
+        console.error('Supabase credentials not configured');
+        return;
+      }
+
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/send-push-notification`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${supabaseAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: notification.beeylo_user_id,
+            title: notification.title,
+            body: notification.message,
+            data: {
+              type: notification.type,
+              order_id: notification.order_id?.toString() || '',
+              order_number: notification.data?.order_number || '',
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('Push notification failed:', error);
+        return;
+      }
+
+      const result: any = await response.json();
+      console.log('✅ Push notification sent:', result.messageId);
+    } catch (error) {
+      console.error('Failed to send push notification:', error);
+    }
   }
 
   /**

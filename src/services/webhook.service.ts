@@ -24,13 +24,26 @@ export class WebhookService {
         throw new Error(`Store not found: ${shopDomain}`);
       }
 
-      // Sync the order
-      const order = await this.syncService.syncOrder(store.id, payload);
+      // Check if customer opted to receive order in Beeylo app
+      const receiveInApp = payload.note_attributes?.find(
+        (attr: any) => attr.name === 'Receive_in_Beeylo_App'
+      )?.value === 'Yes';
 
-      // Send order confirmation notification
-      await this.notificationService.sendOrderConfirmation(order);
+      console.log(`[Order Create] Order ${payload.id} - Receive in App: ${receiveInApp}`);
 
-      return { success: true, order_id: order.id };
+      // Sync the order with receive_in_app flag
+      const order = await this.syncService.syncOrder(store.id, payload, receiveInApp);
+
+      // Only send email notification if customer didn't opt for app delivery
+      if (!receiveInApp) {
+        await this.notificationService.sendOrderConfirmation(order);
+      } else {
+        console.log(`[Order Create] Skipping email notification - customer opted for app delivery`);
+        // Send in-app notification instead
+        await this.notificationService.sendInAppNotification(order);
+      }
+
+      return { success: true, order_id: order.id, receive_in_app: receiveInApp };
     } catch (error) {
       console.error('Failed to handle order create:', error);
       throw error;

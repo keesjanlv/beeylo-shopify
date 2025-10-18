@@ -50,6 +50,9 @@ app.use(cors({
   credentials: true,
 }));
 
+// Serve static files from public directory
+app.use('/public', express.static(path.join(__dirname, '..', 'public')));
+
 // Body parsing middleware
 // Note: Webhooks need raw body for signature verification
 app.use('/webhooks', express.json({
