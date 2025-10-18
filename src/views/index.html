@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beeylo Order Notifications</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Using Unicode symbols instead of Font Awesome to avoid CSP issues -->
     <style>
         :root {
             --primary: #3B82F6;
@@ -123,10 +123,6 @@
         .tab.active {
             color: var(--primary);
             border-bottom-color: var(--primary);
-        }
-
-        .tab i {
-            margin-right: 6px;
         }
 
         .tab-content {
@@ -402,8 +398,8 @@
             border: 1px solid var(--gray-200);
         }
 
-        .feature-card i {
-            color: var(--accent);
+        .feature-card span {
+            display: block;
             font-size: 1.2rem;
             margin-bottom: 6px;
         }
@@ -453,7 +449,7 @@
 
         <!-- Success Banner -->
         <div class="success-banner" id="success-banner" style="display: none;">
-            <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+            <span style="font-size: 1.5rem;">✅</span>
             <div>
                 <strong>Connection Successful!</strong>
                 <p style="margin: 0;">Your Shopify store is connected. Check the Settings tab for setup instructions.</p>
@@ -462,14 +458,14 @@
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('stats')">
-                <i class="fas fa-chart-bar"></i> Stats
+            <button class="tab active" data-tab="stats">
+                📊 Stats
             </button>
-            <button class="tab" onclick="switchTab('orders')">
-                <i class="fas fa-shopping-cart"></i> Recent Orders
+            <button class="tab" data-tab="orders">
+                🛒 Recent Orders
             </button>
-            <button class="tab" onclick="switchTab('settings')">
-                <i class="fas fa-cog"></i> Settings & Setup
+            <button class="tab" data-tab="settings">
+                ⚙️ Settings & Setup
             </button>
         </div>
 
@@ -480,7 +476,7 @@
                 <div class="card">
                     <div class="card-title">
                         Statistics
-                        <button class="btn btn-sm" onclick="loadStats()">Refresh</button>
+                        <button class="btn btn-sm" id="refresh-stats">Refresh</button>
                     </div>
                     <div class="stats-grid">
                         <div class="stat-item">
@@ -532,7 +528,7 @@
             <div class="card">
                 <div class="card-title">
                     Recent Orders
-                    <button class="btn btn-sm" onclick="loadActivity()">Refresh</button>
+                    <button class="btn btn-sm" id="refresh-orders">Refresh</button>
                 </div>
                 <div class="activity-list" id="activity-list">
                     <div class="loading">Loading orders...</div>
@@ -545,30 +541,29 @@
             <!-- Overview Section -->
             <div class="section">
                 <div class="section-title">
-                    <i class="fas fa-mobile-alt"></i>
-                    App Delivery Feature
+                    📱 App Delivery Feature
                 </div>
                 <p style="margin-bottom: 12px;">
                     Allow customers to receive order updates in the Beeylo app instead of email. A checkbox is automatically added to your cart page.
                 </p>
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <i class="fas fa-bell"></i>
+                        <span style="font-size: 1.2rem;">🔔</span>
                         <h4>Push Notifications</h4>
                         <p>Instant order & shipping updates</p>
                     </div>
                     <div class="feature-card">
-                        <i class="fas fa-mobile-alt"></i>
+                        <span style="font-size: 1.2rem;">📱</span>
                         <h4>In-App Tracking</h4>
                         <p>Centralized order management</p>
                     </div>
                     <div class="feature-card">
-                        <i class="fas fa-envelope-open-text"></i>
+                        <span style="font-size: 1.2rem;">📧</span>
                         <h4>Email Suppression</h4>
                         <p>Optional via Shopify Flow</p>
                     </div>
                     <div class="feature-card">
-                        <i class="fas fa-check-circle"></i>
+                        <span style="font-size: 1.2rem;">✅</span>
                         <h4>Auto-Configured</h4>
                         <p>No theme edits required</p>
                     </div>
@@ -578,8 +573,7 @@
             <!-- How It Works -->
             <div class="section">
                 <div class="section-title">
-                    <i class="fas fa-question-circle"></i>
-                    How It Works
+                    ❓ How It Works
                 </div>
                 <ol class="steps">
                     <li>
@@ -604,8 +598,7 @@
             <!-- Testing -->
             <div class="section">
                 <div class="section-title">
-                    <i class="fas fa-vial"></i>
-                    Testing
+                    🧪 Testing
                 </div>
                 <ol class="steps">
                     <li>
@@ -622,11 +615,11 @@
                     </li>
                 </ol>
                 <div class="btn-group">
-                    <button class="btn" onclick="openStorefront()">
-                        <i class="fas fa-store"></i> View Cart Page
+                    <button class="btn" id="view-cart">
+                        🏪 View Cart Page
                     </button>
-                    <button class="btn btn-secondary" onclick="openShopifyAdmin()">
-                        <i class="fas fa-external-link-alt"></i> Create Test Order
+                    <button class="btn btn-secondary" id="create-order">
+                        🔗 Create Test Order
                     </button>
                 </div>
             </div>
@@ -634,11 +627,10 @@
             <!-- Shopify Flow (Plus Only) -->
             <div class="section">
                 <div class="section-title">
-                    <i class="fas fa-project-diagram"></i>
-                    Email Suppression (Shopify Plus Only)
+                    🔀 Email Suppression (Shopify Plus Only)
                 </div>
                 <div class="info-box">
-                    <strong><i class="fas fa-info-circle"></i> Note:</strong> Shopify Flow is only available for Plus merchants. Use it to suppress emails when customers opt for app delivery.
+                    <strong>ℹ️ Note:</strong> Shopify Flow is only available for Plus merchants. Use it to suppress emails when customers opt for app delivery.
                 </div>
 
                 <p style="margin: 12px 0; font-weight: 500;">Setup Workflow in Shopify Flow:</p>
@@ -668,7 +660,7 @@ Check: note_attributes = "Receive_in_Beeylo_App: Yes"
 [TRUE] → Tag order: "beeylo-app-delivery"</div>
 
                 <div class="warning-box">
-                    <strong><i class="fas fa-exclamation-triangle"></i> Non-Plus Alternatives:</strong>
+                    <strong>⚠️ Non-Plus Alternatives:</strong>
                     <br>• Disable all emails in Settings → Notifications
                     <br>• Use third-party app (Klaviyo, Omnisend)
                     <br>• Accept duplicate notifications
@@ -678,24 +670,23 @@ Check: note_attributes = "Receive_in_Beeylo_App: Yes"
             <!-- Troubleshooting -->
             <div class="section">
                 <div class="section-title">
-                    <i class="fas fa-wrench"></i>
-                    Troubleshooting
+                    🔧 Troubleshooting
                 </div>
                 <ul class="feature-list">
                     <li class="feature-item">
-                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        <span style="color: var(--primary);">❓</span>
                         <div>
                             <strong>Checkbox not appearing?</strong> Check browser console for errors. Script should load from /public/beeylo-cart-integration.js
                         </div>
                     </li>
                     <li class="feature-item">
-                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        <span style="color: var(--primary);">❓</span>
                         <div>
                             <strong>Notifications not delivering?</strong> Verify customer has beeylo_user_id linked in database
                         </div>
                     </li>
                     <li class="feature-item">
-                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        <span style="color: var(--primary);">❓</span>
                         <div>
                             <strong>Need more help?</strong> Check Railway logs or review webhook events in dashboard
                         </div>
@@ -719,7 +710,7 @@ Check: note_attributes = "Receive_in_Beeylo_App: Yes"
         }
 
         // Tab switching
-        function switchTab(tabName) {
+        function switchTab(tabName, clickedTab) {
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
@@ -727,12 +718,28 @@ Check: note_attributes = "Receive_in_Beeylo_App: Yes"
                 tab.classList.remove('active');
             });
             document.getElementById(tabName).classList.add('active');
-            event.target.closest('.tab').classList.add('active');
+            if (clickedTab) {
+                clickedTab.classList.add('active');
+            }
 
             // Load data when switching to certain tabs
             if (tabName === 'stats') loadStats();
             if (tabName === 'orders') loadActivity();
         }
+
+        // Add event listeners to tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                switchTab(tabName, this);
+            });
+        });
+
+        // Add event listeners to buttons
+        document.getElementById('refresh-stats')?.addEventListener('click', loadStats);
+        document.getElementById('refresh-orders')?.addEventListener('click', loadActivity);
+        document.getElementById('view-cart')?.addEventListener('click', openStorefront);
+        document.getElementById('create-order')?.addEventListener('click', openShopifyAdmin);
 
         async function loadStats() {
             try {
