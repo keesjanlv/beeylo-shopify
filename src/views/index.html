@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beeylo Order Notifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #3B82F6;
@@ -21,6 +22,10 @@
             --gray-700: #374151;
             --gray-800: #1F2937;
             --gray-900: #111827;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
             --radius-md: 0.5rem;
             --radius-lg: 0.75rem;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -37,7 +42,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: var(--gray-50);
             color: var(--gray-900);
-            padding: 24px;
+            padding: 20px;
             line-height: 1.6;
         }
 
@@ -47,21 +52,19 @@
         }
 
         .header {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .header h1 {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: var(--gray-900);
             margin-bottom: 4px;
-            letter-spacing: -0.01em;
         }
 
         .header p {
             font-size: 0.875rem;
             color: var(--gray-500);
-            font-weight: 400;
         }
 
         .status-badge {
@@ -91,6 +94,50 @@
             50% { opacity: 0.5; }
         }
 
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid var(--gray-200);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: var(--gray-900);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab i {
+            margin-right: 6px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -109,7 +156,6 @@
 
         .card:hover {
             box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
         }
 
         .card-title {
@@ -120,11 +166,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-        }
-
-        .icon {
-            font-size: 16px;
-            color: var(--gray-400);
         }
 
         .stats-grid {
@@ -151,7 +192,6 @@
         .stat-label {
             font-size: 0.75rem;
             color: var(--gray-500);
-            font-weight: 400;
         }
 
         .feature-list {
@@ -178,13 +218,12 @@
         }
 
         .activity-list {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
         }
 
         .activity-item {
             padding: 12px 16px;
-            border-left: 3px solid var(--primary);
             background: white;
             margin-bottom: 8px;
             border-radius: var(--radius-md);
@@ -193,29 +232,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.2s ease;
-        }
-
-        .activity-item:hover {
-            box-shadow: var(--shadow-sm);
-            transform: translateX(2px);
-        }
-
-        .activity-info {
-            flex: 1;
-        }
-
-        .activity-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
         }
 
         .order-number {
             font-weight: 600;
             color: var(--gray-900);
-            font-size: 0.9rem;
         }
 
         .activity-meta {
@@ -223,16 +244,6 @@
             color: var(--gray-500);
             display: flex;
             gap: 12px;
-            align-items: center;
-        }
-
-        .activity-time {
-            font-size: 0.75rem;
-            color: var(--gray-400);
-        }
-
-        .activity-message {
-            color: var(--gray-700);
         }
 
         .order-status {
@@ -240,33 +251,12 @@
             border-radius: 9999px;
             font-size: 0.7rem;
             font-weight: 600;
-            white-space: nowrap;
         }
 
-        .status-paid {
-            background: #D1FAE5;
-            color: #059669;
-        }
-
-        .status-fulfilled {
-            background: #DBEAFE;
-            color: #2563EB;
-        }
-
-        .status-cancelled {
-            background: #FEE2E2;
-            color: #DC2626;
-        }
-
-        .status-pending {
-            background: #FEF3C7;
-            color: #D97706;
-        }
-
-        .status-partial {
-            background: #E0E7FF;
-            color: #6366F1;
-        }
+        .status-paid { background: #D1FAE5; color: #059669; }
+        .status-fulfilled { background: #DBEAFE; color: #2563EB; }
+        .status-cancelled { background: #FEE2E2; color: #DC2626; }
+        .status-pending { background: #FEF3C7; color: #D97706; }
 
         .btn {
             display: inline-block;
@@ -284,8 +274,6 @@
 
         .btn:hover {
             background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
         }
 
         .btn-sm {
@@ -303,33 +291,6 @@
             background: var(--primary-light);
         }
 
-        .test-section {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-200);
-        }
-
-        .test-steps {
-            background: var(--gray-50);
-            padding: 16px;
-            border-radius: var(--radius-md);
-            margin-top: 12px;
-            border: 1px solid var(--gray-200);
-        }
-
-        .test-steps ol {
-            padding-left: 20px;
-            font-size: 0.875rem;
-            color: var(--gray-700);
-        }
-
-        .test-steps li {
-            margin: 8px 0;
-            line-height: 1.5;
-        }
-
         .loading, .empty-state {
             text-align: center;
             padding: 24px;
@@ -337,28 +298,144 @@
             font-size: 0.875rem;
         }
 
+        /* Settings Tab Styles */
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .info-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            font-size: 0.875rem;
+        }
+
+        .warning-box {
+            background: var(--warning-light);
+            border-left: 4px solid var(--warning);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            font-size: 0.875rem;
+        }
+
+        .success-banner {
+            background: var(--success-light);
+            border: 1px solid var(--success);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--success);
+        }
+
+        .steps {
+            list-style: none;
+            counter-reset: step-counter;
+            padding-left: 0;
+        }
+
+        .steps li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 45px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .steps li strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        .feature-card {
+            background: var(--gray-50);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .feature-card i {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+        }
+
+        .feature-card h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature-card p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        .code-block {
+            background: var(--gray-900);
+            color: #E5E7EB;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
         .btn-group {
             display: flex;
             gap: 8px;
-            margin-top: 16px;
-        }
-
-        /* Scrollbar */
-        .activity-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .activity-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .activity-list::-webkit-scrollbar-thumb {
-            background-color: var(--gray-300);
-            border-radius: 3px;
-        }
-
-        .activity-list::-webkit-scrollbar-thumb:hover {
-            background-color: var(--gray-400);
+            flex-wrap: wrap;
+            margin-top: 12px;
         }
     </style>
 </head>
@@ -366,91 +443,264 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>Shopify Integration</h1>
-            <p>Real-time order sync and customer notifications</p>
+            <h1>Beeylo Shopify Integration</h1>
+            <p>Real-time order sync, customer notifications, and app delivery</p>
             <div class="status-badge">
                 <span class="status-dot"></span>
                 Active
             </div>
         </div>
 
-        <!-- Stats and Features Grid -->
-        <div class="grid">
-            <!-- Statistics Card -->
+        <!-- Success Banner -->
+        <div class="success-banner" id="success-banner" style="display: none;">
+            <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+            <div>
+                <strong>Connection Successful!</strong>
+                <p style="margin: 0;">Your Shopify store is connected. Check the Settings tab for setup instructions.</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('stats')">
+                <i class="fas fa-chart-bar"></i> Stats
+            </button>
+            <button class="tab" onclick="switchTab('orders')">
+                <i class="fas fa-shopping-cart"></i> Recent Orders
+            </button>
+            <button class="tab" onclick="switchTab('settings')">
+                <i class="fas fa-cog"></i> Settings & Setup
+            </button>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="stats" class="tab-content active">
+            <div class="grid">
+                <!-- Statistics Card -->
+                <div class="card">
+                    <div class="card-title">
+                        Statistics
+                        <button class="btn btn-sm" onclick="loadStats()">Refresh</button>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-orders">-</div>
+                            <div class="stat-label">Orders</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-webhooks">-</div>
+                            <div class="stat-label">Webhooks</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="pending-notifications">-</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="active-stores">-</div>
+                            <div class="stat-label">Stores</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features Card -->
+                <div class="card">
+                    <div class="card-title">Active Features</div>
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <span class="check">✓</span>
+                            Real-time order sync
+                        </li>
+                        <li class="feature-item">
+                            <span class="check">✓</span>
+                            Customer notifications
+                        </li>
+                        <li class="feature-item">
+                            <span class="check">✓</span>
+                            App delivery option
+                        </li>
+                        <li class="feature-item">
+                            <span class="check">✓</span>
+                            Fulfillment tracking
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="orders" class="tab-content">
             <div class="card">
                 <div class="card-title">
-                    Statistics
-                    <button class="btn btn-sm" onclick="loadStats()">Refresh</button>
+                    Recent Orders
+                    <button class="btn btn-sm" onclick="loadActivity()">Refresh</button>
                 </div>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number" id="total-orders">-</div>
-                        <div class="stat-label">Orders</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="total-webhooks">-</div>
-                        <div class="stat-label">Webhooks</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="pending-notifications">-</div>
-                        <div class="stat-label">Pending</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="active-stores">-</div>
-                        <div class="stat-label">Stores</div>
-                    </div>
+                <div class="activity-list" id="activity-list">
+                    <div class="loading">Loading orders...</div>
                 </div>
-            </div>
-
-            <!-- Features Card -->
-            <div class="card">
-                <div class="card-title">Features</div>
-                <ul class="feature-list">
-                    <li class="feature-item">
-                        <span class="check">✓</span>
-                        Real-time order sync
-                    </li>
-                    <li class="feature-item">
-                        <span class="check">✓</span>
-                        Customer notifications
-                    </li>
-                    <li class="feature-item">
-                        <span class="check">✓</span>
-                        Fulfillment tracking
-                    </li>
-                    <li class="feature-item">
-                        <span class="check">✓</span>
-                        Multi-courier support
-                    </li>
-                </ul>
             </div>
         </div>
 
-        <!-- Recent Orders Card -->
-        <div class="card" style="margin-bottom: 16px;">
-            <div class="card-title">
-                Recent Orders
-                <button class="btn btn-sm" onclick="loadActivity()">Refresh</button>
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <!-- Overview Section -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-mobile-alt"></i>
+                    App Delivery Feature
+                </div>
+                <p style="margin-bottom: 12px;">
+                    Allow customers to receive order updates in the Beeylo app instead of email. A checkbox is automatically added to your cart page.
+                </p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-bell"></i>
+                        <h4>Push Notifications</h4>
+                        <p>Instant order & shipping updates</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h4>In-App Tracking</h4>
+                        <p>Centralized order management</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-envelope-open-text"></i>
+                        <h4>Email Suppression</h4>
+                        <p>Optional via Shopify Flow</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>Auto-Configured</h4>
+                        <p>No theme edits required</p>
+                    </div>
+                </div>
             </div>
-            <div class="activity-list" id="activity-list">
-                <div class="loading">Loading orders...</div>
-            </div>
-        </div>
 
-        <!-- Test Section -->
-        <div class="test-section">
-            <div class="card-title">Test Integration</div>
-            <div class="test-steps">
-                <ol>
-                    <li>Create a test order in your Shopify admin</li>
-                    <li>Add products and mark the order as paid</li>
-                    <li>Click "Refresh" above to see the webhook event</li>
-                    <li>Fulfill the order with tracking to test notifications</li>
+            <!-- How It Works -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-question-circle"></i>
+                    How It Works
+                </div>
+                <ol class="steps">
+                    <li>
+                        <strong>Customer visits cart page</strong>
+                        <span>Checkbox automatically appears: "Receive order updates in Beeylo app"</span>
+                    </li>
+                    <li>
+                        <strong>Customer opts in</strong>
+                        <span>Preference saved as cart attribute</span>
+                    </li>
+                    <li>
+                        <strong>Order created</strong>
+                        <span>Webhook sent to Beeylo with preference</span>
+                    </li>
+                    <li>
+                        <strong>Notification delivered</strong>
+                        <span>App notification + push (or email if not opted in)</span>
+                    </li>
                 </ol>
             </div>
-            <div class="btn-group">
-                <button class="btn" onclick="openShopifyOrders()">Create Test Order</button>
-                <button class="btn btn-secondary" onclick="window.location.reload()">Reload Page</button>
+
+            <!-- Testing -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-vial"></i>
+                    Testing
+                </div>
+                <ol class="steps">
+                    <li>
+                        <strong>Visit your cart page</strong>
+                        <span>You should see the "Receive in Beeylo app" checkbox</span>
+                    </li>
+                    <li>
+                        <strong>Check the box and complete checkout</strong>
+                        <span>Use an email linked to a Beeylo user</span>
+                    </li>
+                    <li>
+                        <strong>Verify notification in Beeylo app</strong>
+                        <span>Order should appear in app (no email sent)</span>
+                    </li>
+                </ol>
+                <div class="btn-group">
+                    <button class="btn" onclick="openStorefront()">
+                        <i class="fas fa-store"></i> View Cart Page
+                    </button>
+                    <button class="btn btn-secondary" onclick="openShopifyAdmin()">
+                        <i class="fas fa-external-link-alt"></i> Create Test Order
+                    </button>
+                </div>
+            </div>
+
+            <!-- Shopify Flow (Plus Only) -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-project-diagram"></i>
+                    Email Suppression (Shopify Plus Only)
+                </div>
+                <div class="info-box">
+                    <strong><i class="fas fa-info-circle"></i> Note:</strong> Shopify Flow is only available for Plus merchants. Use it to suppress emails when customers opt for app delivery.
+                </div>
+
+                <p style="margin: 12px 0; font-weight: 500;">Setup Workflow in Shopify Flow:</p>
+                <ol class="steps">
+                    <li>
+                        <strong>Open Flow</strong>
+                        <span>Admin → Apps → Flow → Create workflow</span>
+                    </li>
+                    <li>
+                        <strong>Set Trigger</strong>
+                        <span>Trigger: Order created</span>
+                    </li>
+                    <li>
+                        <strong>Add Condition</strong>
+                        <span>IF Note attributes contains "Receive_in_Beeylo_App" AND "Yes"</span>
+                    </li>
+                    <li>
+                        <strong>Add Action</strong>
+                        <span>Add tag: "beeylo-app-delivery"</span>
+                    </li>
+                </ol>
+
+                <div class="code-block">Order Created
+  ↓
+Check: note_attributes = "Receive_in_Beeylo_App: Yes"
+  ↓
+[TRUE] → Tag order: "beeylo-app-delivery"</div>
+
+                <div class="warning-box">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Non-Plus Alternatives:</strong>
+                    <br>• Disable all emails in Settings → Notifications
+                    <br>• Use third-party app (Klaviyo, Omnisend)
+                    <br>• Accept duplicate notifications
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-wrench"></i>
+                    Troubleshooting
+                </div>
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        <div>
+                            <strong>Checkbox not appearing?</strong> Check browser console for errors. Script should load from /public/beeylo-cart-integration.js
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        <div>
+                            <strong>Notifications not delivering?</strong> Verify customer has beeylo_user_id linked in database
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        <div>
+                            <strong>Need more help?</strong> Check Railway logs or review webhook events in dashboard
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -458,6 +708,31 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const shop = urlParams.get('shop');
+
+        // Show success banner if connected
+        if (urlParams.get('connected') === 'true') {
+            document.getElementById('success-banner').style.display = 'flex';
+            // Switch to settings tab
+            setTimeout(() => {
+                switchTab('settings');
+            }, 100);
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.closest('.tab').classList.add('active');
+
+            // Load data when switching to certain tabs
+            if (tabName === 'stats') loadStats();
+            if (tabName === 'orders') loadActivity();
+        }
 
         async function loadStats() {
             try {
@@ -487,16 +762,14 @@
                             const statusClass = getStatusClass(order.status);
                             return `
                                 <div class="activity-item">
-                                    <div class="activity-info">
-                                        <div class="activity-header">
-                                            <span class="order-number">${order.order_name}</span>
-                                        </div>
+                                    <div>
+                                        <div class="order-number">${order.order_name}</div>
                                         <div class="activity-meta">
                                             <span>${order.customer_name}</span>
                                             <span>•</span>
                                             <span>${order.currency} ${order.total_price}</span>
                                             <span>•</span>
-                                            <span class="activity-time">${formatTime(order.created_at)}</span>
+                                            <span>${formatTime(order.created_at)}</span>
                                         </div>
                                     </div>
                                     <div class="order-status ${statusClass}">${order.status}</div>
@@ -507,7 +780,7 @@
                         activityList.innerHTML = '<div class="empty-state">No orders yet. Create a test order to get started.</div>';
                     }
                 } else {
-                    activityList.innerHTML = '<div class="empty-state">No orders yet. Create a test order to get started.</div>';
+                    activityList.innerHTML = '<div class="empty-state">No orders yet.</div>';
                 }
             } catch (error) {
                 console.error('Error loading activity:', error);
@@ -520,7 +793,6 @@
             if (statusLower.includes('fulfilled')) return 'status-fulfilled';
             if (statusLower.includes('paid')) return 'status-paid';
             if (statusLower.includes('cancel')) return 'status-cancelled';
-            if (statusLower.includes('partial')) return 'status-partial';
             return 'status-pending';
         }
 
@@ -532,10 +804,10 @@
             if (diff < 60) return 'Just now';
             if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
             if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            return date.toLocaleDateString();
         }
 
-        function openShopifyOrders() {
+        function openShopifyAdmin() {
             if (shop) {
                 window.open(`https://${shop}/admin/orders/new`, '_blank');
             } else {
@@ -543,8 +815,20 @@
             }
         }
 
+        function openStorefront() {
+            if (shop) {
+                const storeDomain = shop.replace('.myshopify.com', '');
+                window.open(`https://${storeDomain}.myshopify.com/cart`, '_blank');
+            } else {
+                alert('Please access this page through your Shopify admin.');
+            }
+        }
+
+        // Load initial data
         loadStats();
         loadActivity();
+
+        // Auto-refresh every 30 seconds
         setInterval(() => {
             loadStats();
             loadActivity();
