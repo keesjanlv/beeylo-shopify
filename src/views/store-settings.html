@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Settings - Beeylo Shopify Integration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3B82F6;
+            --primary-hover: #2563EB;
+            --primary-light: #DBEAFE;
+            --accent: #10B981;
+            --accent-light: #D1FAE5;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            padding: 24px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .setting-item {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .setting-label {
+            flex: 1;
+        }
+
+        .setting-label h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .setting-label p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray-300);
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .toggle-slider:hover {
+            opacity: 0.9;
+        }
+
+        .info-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+        }
+
+        .warning-box {
+            background: var(--warning-light);
+            border-left: 4px solid var(--warning);
+            padding: 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+        }
+
+        .success-box {
+            background: var(--success-light);
+            border-left: 4px solid var(--success);
+            padding: 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+        }
+
+        .info-box p, .warning-box p, .success-box p {
+            margin: 0;
+            color: var(--gray-800);
+            font-size: 0.875rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            border: 1px solid var(--gray-200);
+        }
+
+        .toast.show {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid #DC2626;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--gray-300);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .setting-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-cog"></i>
+                Store Settings
+            </h1>
+            <p>Configure notification and delivery preferences for your Shopify store</p>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-bell"></i>
+                Notification Settings
+            </div>
+
+            <div class="info-box">
+                <p><strong><i class="fas fa-info-circle"></i> About Notification Suppression:</strong> When customers opt to receive order updates through the Beeylo app (by checking the cart page checkbox), you can choose whether to suppress Shopify's default email notifications for shipping and fulfillment updates.</p>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-label">
+                        <h3>Suppress Shopify notifications for Beeylo orders</h3>
+                        <p>When enabled, customers who opt for Beeylo app delivery will NOT receive Shopify's shipping and fulfillment email notifications. They will only receive notifications through the Beeylo app.</p>
+                        <p style="margin-top: 8px; color: var(--gray-500); font-size: 0.8rem;">
+                            <strong>Note:</strong> Order confirmation emails cannot be suppressed (Shopify requirement).
+                        </p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input
+                            type="checkbox"
+                            id="suppress-notifications"
+                            checked
+                        >
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div id="suppression-details" style="margin-top: 16px; display: block;">
+                    <div class="success-box">
+                        <p><strong><i class="fas fa-check-circle"></i> Currently enabled:</strong> Customers who choose Beeylo app delivery will receive shipping and fulfillment notifications ONLY through the Beeylo app. Shopify email notifications will be suppressed.</p>
+                    </div>
+                </div>
+
+                <div id="duplicate-details" style="margin-top: 16px; display: none;">
+                    <div class="warning-box">
+                        <p><strong><i class="fas fa-exclamation-triangle"></i> Currently disabled:</strong> Customers who choose Beeylo app delivery will receive notifications through BOTH the Beeylo app AND Shopify emails. This may result in duplicate notifications.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-label">
+                        <h3>Auto-sync orders</h3>
+                        <p>Automatically sync new orders from Shopify to Beeylo in real-time via webhooks.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input
+                            type="checkbox"
+                            id="auto-sync"
+                            checked
+                        >
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-label">
+                        <h3>Send shipping updates</h3>
+                        <p>Send shipping notifications to customers when orders are fulfilled (applies to regular email delivery orders).</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input
+                            type="checkbox"
+                            id="send-shipping-updates"
+                            checked
+                        >
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-label">
+                        <h3>Send delivery updates</h3>
+                        <p>Send delivery confirmation notifications when packages are delivered (applies to regular email delivery orders).</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input
+                            type="checkbox"
+                            id="send-delivery-updates"
+                            checked
+                        >
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+                <a href="/settings" class="btn" style="background: var(--gray-600);">
+                    <i class="fas fa-arrow-left"></i> Back to Overview
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+        <span id="toast-message">Settings saved successfully!</span>
+    </div>
+
+    <script>
+        let storeId = null;
+
+        // Load settings on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+
+            // Add event listener for suppression toggle
+            document.getElementById('suppress-notifications').addEventListener('change', function() {
+                const suppressionDetails = document.getElementById('suppression-details');
+                const duplicateDetails = document.getElementById('duplicate-details');
+
+                if (this.checked) {
+                    suppressionDetails.style.display = 'block';
+                    duplicateDetails.style.display = 'none';
+                } else {
+                    suppressionDetails.style.display = 'none';
+                    duplicateDetails.style.display = 'block';
+                }
+            });
+        });
+
+        async function loadSettings() {
+            try {
+                // Get store ID from URL params
+                const urlParams = new URLSearchParams(window.location.search);
+                storeId = urlParams.get('store_id');
+
+                if (!storeId) {
+                    showToast('Store ID not found', 'error');
+                    return;
+                }
+
+                // Fetch current settings
+                const response = await fetch(`/api/stores/${storeId}`);
+
+                if (!response.ok) {
+                    throw new Error('Failed to load settings');
+                }
+
+                const data = await response.json();
+                const settings = data.store.settings || {};
+
+                // Set toggle states
+                document.getElementById('suppress-notifications').checked =
+                    settings.suppress_shopify_notifications_for_beeylo_orders !== false;
+                document.getElementById('auto-sync').checked =
+                    settings.auto_sync !== false;
+                document.getElementById('send-shipping-updates').checked =
+                    settings.send_shipping_updates !== false;
+                document.getElementById('send-delivery-updates').checked =
+                    settings.send_delivery_updates !== false;
+
+                // Update visibility of details
+                const suppressionToggle = document.getElementById('suppress-notifications');
+                const event = new Event('change');
+                suppressionToggle.dispatchEvent(event);
+
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                showToast('Failed to load settings', 'error');
+            }
+        }
+
+        async function saveSettings() {
+            if (!storeId) {
+                showToast('Store ID not found', 'error');
+                return;
+            }
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading"></div> Saving...';
+
+            try {
+                const settings = {
+                    suppress_shopify_notifications_for_beeylo_orders:
+                        document.getElementById('suppress-notifications').checked,
+                    auto_sync:
+                        document.getElementById('auto-sync').checked,
+                    send_shipping_updates:
+                        document.getElementById('send-shipping-updates').checked,
+                    send_delivery_updates:
+                        document.getElementById('send-delivery-updates').checked,
+                    sync_interval_minutes: 15 // Keep existing value
+                };
+
+                const response = await fetch(`/api/stores/${storeId}/settings`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ settings })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save settings');
+                }
+
+                showToast('Settings saved successfully!', 'success');
+
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                showToast('Failed to save settings', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Save Settings';
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const icon = toast.querySelector('i');
+
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle';
+                icon.style.color = 'var(--success)';
+            } else {
+                icon.className = 'fas fa-exclamation-circle';
+                icon.style.color = '#DC2626';
+            }
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

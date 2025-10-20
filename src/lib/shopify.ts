@@ -187,6 +187,47 @@ export const shopifyHelpers = {
       path: `script_tags/${scriptTagId}`,
     });
   },
+
+  // Update order tags (used to mark Beeylo app delivery orders)
+  async updateOrderTags(shop: string, accessToken: string, orderId: string, tags: string) {
+    const client = createRestClient(shop, accessToken);
+
+    const response = await client.put({
+      path: `orders/${orderId}`,
+      data: {
+        order: {
+          id: orderId,
+          tags: tags,
+        },
+      },
+    });
+
+    return response.body as any;
+  },
+
+  // Add tags to an existing order (preserves existing tags)
+  async addOrderTag(shop: string, accessToken: string, orderId: string, newTag: string) {
+    try {
+      // First, fetch the current order to get existing tags
+      const orderResponse = await this.fetchOrder(shop, accessToken, orderId);
+      const order = orderResponse.order;
+
+      // Parse existing tags
+      const existingTags = order.tags ? order.tags.split(',').map((t: string) => t.trim()) : [];
+
+      // Add new tag if it doesn't exist
+      if (!existingTags.includes(newTag)) {
+        existingTags.push(newTag);
+      }
+
+      // Update with combined tags
+      const updatedTags = existingTags.join(', ');
+      return await this.updateOrderTags(shop, accessToken, orderId, updatedTags);
+    } catch (error) {
+      console.error('Failed to add order tag:', error);
+      throw error;
+    }
+  },
 };
 
 // Webhook topics to register

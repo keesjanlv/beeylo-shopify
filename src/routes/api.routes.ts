@@ -199,15 +199,57 @@ router.post('/tracking/refresh', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/stores/:store_id
+ * Get a specific store with settings
+ */
+router.get('/stores/:store_id', async (req: Request, res: Response) => {
+  try {
+    const { store_id } = req.params;
+
+    const store = await db.getStore(store_id);
+
+    if (!store) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+
+    // Remove sensitive access_token from response
+    const { access_token, ...storeData } = store;
+
+    res.json({ store: storeData });
+  } catch (error: any) {
+    console.error('Get store error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * PUT /api/stores/:store_id/settings
  * Update store settings
  */
 router.put('/stores/:store_id/settings', async (req: Request, res: Response) => {
   try {
     const { store_id } = req.params;
-    const settings = req.body;
+    const { settings } = req.body;
 
-    const store = await db.updateStore(store_id, { settings });
+    if (!settings) {
+      return res.status(400).json({ error: 'Missing settings in request body' });
+    }
+
+    // Ensure default values for new settings
+    const updatedSettings = {
+      auto_sync: settings.auto_sync !== false,
+      sync_interval_minutes: settings.sync_interval_minutes || 15,
+      send_order_confirmations: settings.send_order_confirmations !== false,
+      send_shipping_updates: settings.send_shipping_updates !== false,
+      send_delivery_updates: settings.send_delivery_updates !== false,
+      // New setting with default true
+      suppress_shopify_notifications_for_beeylo_orders:
+        settings.suppress_shopify_notifications_for_beeylo_orders !== false,
+    };
+
+    const store = await db.updateStore(store_id, { settings: updatedSettings });
+
+    console.log(`[Settings] Updated store ${store_id} settings:`, updatedSettings);
 
     res.json({ success: true, store });
   } catch (error: any) {
