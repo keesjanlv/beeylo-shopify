@@ -167,12 +167,11 @@ export class WebhookService {
         // Beeylo app order, but store owner wants to keep Shopify emails too
         console.log(`[Fulfillment Create] Sending both email and app notification - store setting allows duplicate notifications`);
         await this.notificationService.sendShippingNotification(order, fulfillment);
-        await this.notificationService.sendInAppShippingNotification(order, fulfillment);
       } else {
         // Beeylo app order with suppression enabled (default)
-        console.log(`[Fulfillment Create] Skipping shipping notification - order ${payload.order_id} uses Beeylo app delivery`);
-        // Send in-app notification instead
-        await this.notificationService.sendInAppShippingNotification(order, fulfillment);
+        console.log(`[Fulfillment Create] Sending in-app shipping notification for order ${payload.order_id}`);
+        // Send in-app notification
+        await this.notificationService.sendShippingNotification(order, fulfillment);
       }
 
       // Start tracking the shipment
