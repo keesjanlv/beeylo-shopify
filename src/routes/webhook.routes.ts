@@ -3,6 +3,7 @@ import { WebhookService } from '../services/webhook.service';
 import { db } from '../lib/supabase';
 import crypto from 'crypto';
 import { config } from '../config';
+import { queueWebhook } from '../lib/queue';
 
 const router = Router();
 const webhookService = new WebhookService();
@@ -30,8 +31,7 @@ async function verifyWebhook(req: Request, res: Response, next: Function) {
       return res.status(400).json({ error: 'Missing raw body' });
     }
 
-    // Manually verify HMAC using Shopify API Secret (not webhook secret)
-    // When webhooks are registered via REST API, Shopify uses the API secret to sign them
+    // Manually verify HMAC using Shopify API Secret
     const hash = crypto
       .createHmac('sha256', config.shopify.apiSecret)
       .update(rawBody, 'utf8')
@@ -61,120 +61,97 @@ async function verifyWebhook(req: Request, res: Response, next: Function) {
 }
 
 /**
+ * Helper to queue webhook and respond immediately
+ */
+async function queueAndRespond(
+  req: Request,
+  res: Response,
+  topic: string
+) {
+  try {
+    // Get store for storeId
+    const store = await db.getStoreByDomain(req.shopDomain!);
+    if (!store) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+
+    // Queue webhook processing (responds within 1 second)
+    await queueWebhook({
+      topic,
+      shopDomain: req.shopDomain!,
+      payload: req.body,
+      storeId: store.id,
+    });
+
+    // Acknowledge immediately (Shopify requires response within 5 seconds)
+    res.status(200).json({ success: true, queued: true });
+  } catch (error: any) {
+    console.error(`${topic} webhook error:`, error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+/**
  * POST /webhooks/orders-create
  */
 router.post('/orders-create', verifyWebhook, async (req: Request, res: Response) => {
-  try {
-    const result = await webhookService.handleOrderCreate(req.shopDomain!, req.body);
-    res.json(result);
-  } catch (error: any) {
-    console.error('orders-create webhook error:', error);
-    res.status(500).json({ error: error.message });
-  }
+  await queueAndRespond(req, res, 'orders/create');
 });
 
 /**
  * POST /webhooks/orders-updated
  */
 router.post('/orders-updated', verifyWebhook, async (req: Request, res: Response) => {
-  try {
-    const result = await webhookService.handleOrderUpdate(req.shopDomain!, req.body);
-    res.json(result);
-  } catch (error: any) {
-    console.error('orders-updated webhook error:', error);
-    res.status(500).json({ error: error.message });
-  }
+  await queueAndRespond(req, res, 'orders/updated');
 });
 
 /**
  * POST /webhooks/orders-cancelled
  */
 router.post('/orders-cancelled', verifyWebhook, async (req: Request, res: Response) => {
-  try {
-    const result = await webhookService.handleOrderCancelled(req.shopDomain!, req.body);
-    res.json(result);
-  } catch (error: any) {
-    console.error('orders-cancelled webhook error:', error);
-    res.status(500).json({ error: error.message });
-  }
+  await queueAndRespond(req, res, 'orders/cancelled');
 });
 
 /**
  * POST /webhooks/orders-fulfilled
  */
 router.post('/orders-fulfilled', verifyWebhook, async (req: Request, res: Response) => {
-  try {
-    const result = await webhookService.handleOrderFulfilled(req.shopDomain!, req.body);
-    res.json(result);
-  } catch (error: any) {
-    console.error('orders-fulfilled webhook error:', error);
-    res.status(500).json({ error: error.message });
-  }
+  await queueAndRespond(req, res, 'orders/fulfilled');
 });
 
 /**
  * POST /webhooks/orders-paid
  */
 router.post('/orders-paid', verifyWebhook, async (req: Request, res: Response) => {
-  try {
-    const result = await webhookService.handleOrderUpdate(req.shopDomain!, req.body);
-    res.json(result);
-  } catch (error: any) {
-    console.error('orders-paid webhook error:', error);
-    res.status(500).json({ error: error.message });
-  }
+  await queueAndRespond(req, res, 'orders/updated');
 });
 
 /**
  * POST /webhooks/fulfillments-create
  */
 router.post('/fulfillments-create', verifyWebhook, async (req: Request, res: Response) => {
-  try {
-    const result = await webhookService.handleFulfillmentCreate(req.shopDomain!, req.body);
-    res.json(result);
-  } catch (error: any) {
-    console.error('fulfillments-create webhook error:', error);
-    res.status(500).json({ error: error.message });
-  }
+  await queueAndRespond(req, res, 'fulfillments/create');
 });
 
 /**
  * POST /webhooks/fulfillments-update
  */
 router.post('/fulfillments-update', verifyWebhook, async (req: Request, res: Response) => {
-  try {
-    const result = await webhookService.handleFulfillmentUpdate(req.shopDomain!, req.body);
-    res.json(result);
-  } catch (error: any) {
-    console.error('fulfillments-update webhook error:', error);
-    res.status(500).json({ error: error.message });
-  }
+  await queueAndRespond(req, res, 'fulfillments/update');
 });
 
 /**
  * POST /webhooks/customers-create
  */
 router.post('/customers-create', verifyWebhook, async (req: Request, res: Response) => {
-  try {
-    const result = await webhookService.handleCustomerCreate(req.shopDomain!, req.body);
-    res.json(result);
-  } catch (error: any) {
-    console.error('customers-create webhook error:', error);
-    res.status(500).json({ error: error.message });
-  }
+  await queueAndRespond(req, res, 'customers/create');
 });
 
 /**
  * POST /webhooks/customers-update
  */
 router.post('/customers-update', verifyWebhook, async (req: Request, res: Response) => {
-  try {
-    const result = await webhookService.handleCustomerUpdate(req.shopDomain!, req.body);
-    res.json(result);
-  } catch (error: any) {
-    console.error('customers-update webhook error:', error);
-    res.status(500).json({ error: error.message });
-  }
+  await queueAndRespond(req, res, 'customers/update');
 });
 
 // Extend Express Request type

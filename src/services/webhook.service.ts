@@ -2,6 +2,7 @@ import { db } from '../lib/supabase';
 import { SyncService } from './sync.service';
 import { NotificationService } from './notification.service';
 import { TrackingService } from './tracking.service';
+import { queueTracking } from '../lib/queue';
 
 export class WebhookService {
   private syncService: SyncService;
@@ -174,13 +175,15 @@ export class WebhookService {
         await this.notificationService.sendShippingNotification(order, fulfillment);
       }
 
-      // Start tracking the shipment
+      // Queue tracking job (async, won't block webhook response)
       if (fulfillment.tracking_number && fulfillment.tracking_company) {
-        await this.trackingService.startTracking(
-          fulfillment.id,
-          fulfillment.tracking_number,
-          fulfillment.tracking_company
-        );
+        await queueTracking({
+          fulfillmentId: fulfillment.id,
+          trackingNumber: fulfillment.tracking_number,
+          courierName: fulfillment.tracking_company,
+          storeId: store.id,
+        });
+        console.log(`[Fulfillment Create] Queued tracking job for ${fulfillment.tracking_number}`);
       }
 
       return { success: true, fulfillment_id: fulfillment.id };
@@ -215,13 +218,15 @@ export class WebhookService {
       // Sync the fulfillment
       const fulfillment = await this.syncService.syncFulfillment(order.id, payload);
 
-      // Check tracking updates
+      // Queue tracking update job
       if (fulfillment.tracking_number && fulfillment.tracking_company) {
-        await this.trackingService.startTracking(
-          fulfillment.id,
-          fulfillment.tracking_number,
-          fulfillment.tracking_company
-        );
+        await queueTracking({
+          fulfillmentId: fulfillment.id,
+          trackingNumber: fulfillment.tracking_number,
+          courierName: fulfillment.tracking_company,
+          storeId: store.id,
+        });
+        console.log(`[Fulfillment Update] Queued tracking update for ${fulfillment.tracking_number}`);
       }
 
       return { success: true, fulfillment_id: fulfillment.id };

@@ -24,6 +24,9 @@ export const config = {
     nodeEnv: process.env.NODE_ENV || 'development',
   },
 
+  // Redis Configuration (for queue and rate limiting)
+  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
+
   // Courier API Configuration
   couriers: {
     postnl: {
