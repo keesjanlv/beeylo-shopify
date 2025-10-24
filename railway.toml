@@ -1,5 +1,6 @@
 [build]
 builder = "NIXPACKS"
+watchPatterns = ["shopify/**"]
 
 [deploy]
 startCommand = "npm run worker"
