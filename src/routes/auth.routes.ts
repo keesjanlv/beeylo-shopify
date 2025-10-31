@@ -53,11 +53,13 @@ router.get('/callback', async (req: Request, res: Response) => {
       state as string
     );
 
-    // Redirect to the app's embedded dashboard page
-    res.redirect(`/?shop=${shop}&store_id=${store.id}&connected=true`);
+    // Redirect back to the dashboard integrations page with success message
+    const dashboardUrl = config.urls.dashboard;
+    res.redirect(`${dashboardUrl}/settings/integrations?shopify_connected=true&shop=${shop}`);
   } catch (error: any) {
     console.error('OAuth callback error:', error);
-    res.redirect(`/?error=${encodeURIComponent(error.message)}`);
+    const dashboardUrl = config.urls.dashboard;
+    res.redirect(`${dashboardUrl}/settings/integrations?shopify_error=${encodeURIComponent(error.message)}`);
   }
 });
 
