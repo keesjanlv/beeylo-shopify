@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { OAuthService } from '../services/oauth.service';
+import { config } from '../config';
 
 const router = Router();
 const oauthService = new OAuthService();
