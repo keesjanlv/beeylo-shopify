@@ -14,11 +14,17 @@ export class SyncService {
    */
   async syncOrder(storeId: string, shopifyOrder: any, receiveInApp?: boolean) {
     try {
-      // First, sync the customer if exists
+      // First, sync the customer if exists (from order webhook data, not Customers API)
       let customerId = null;
       if (shopifyOrder.customer) {
-        const customer = await this.syncCustomer(storeId, shopifyOrder.customer);
-        customerId = customer.id;
+        try {
+          const customer = await this.syncCustomer(storeId, shopifyOrder.customer);
+          customerId = customer.id;
+        } catch (customerError) {
+          // Customer sync failed - continue without customer_id
+          // Order will still be created with email for user linking
+          console.warn('Failed to sync customer, continuing with order sync:', customerError);
+        }
       }
 
       // Check for receive_in_app from note_attributes if not explicitly provided
