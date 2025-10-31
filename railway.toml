@@ -3,6 +3,6 @@ builder = "NIXPACKS"
 watchPatterns = ["shopify/**"]
 
 [deploy]
-startCommand = "npm run worker"
+startCommand = "npm start"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
